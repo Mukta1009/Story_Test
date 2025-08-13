@@ -1,0 +1,121 @@
+.container {
+  max-width: 700px;
+  margin: 32px auto;
+  background: #fff;
+  padding: 32px 36px;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+h2 {
+  margin-bottom: 24px;
+  font-weight: 700;
+  color: #2F334A;
+}
+
+.bill-header {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 18px;
+  font-size: 16px;
+  color: #444;
+}
+
+.patient-details {
+  margin-bottom: 18px;
+  font-size: 15px;
+  color: #555;
+}
+
+.bill-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 18px;
+  font-size: 15px;
+}
+
+.bill-table th, .bill-table td {
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.bill-table thead tr {
+  background-color: #f1f4f8;
+}
+
+.bill-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.status-badge {
+  padding: 5px 14px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  display: inline-block;
+}
+
+.status-paid {
+  background-color: #4caf50;
+}
+
+.status-pending {
+  background-color: #f9a825;
+}
+
+.bill-total {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.total-amount {
+  color: #2F9CCA;
+  font-size: 20px;
+}
+
+.bill-actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.generate-btn {
+  background-color: #2F9CCA;
+  color: white;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  transition: background-color 0.2s;
+}
+
+.generate-btn.secondary {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.generate-btn:not(.secondary):hover {
+  background-color: #1a7f9c;
+}
+
+.error-message {
+  color: #d32f2f;
+  margin-top: 12px;
+  font-size: 15px;
+}
+
+.loading-message {
+  color: #2F9CCA;
+  font-size: 16px;
+  margin: 24px 0;
+  text-align: center;
+}

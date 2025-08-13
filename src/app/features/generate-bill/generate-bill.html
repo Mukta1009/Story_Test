@@ -1,0 +1,76 @@
+<div class="container">
+  <h2>Generated Bill</h2>
+
+  <!-- Patient ID Input -->
+  <div *ngIf="isAskingForPatientId">
+    <label for="patientIdInput"><strong>Enter Patient ID:</strong></label>
+    <input
+      id="patientIdInput"
+      type="number"
+      [(ngModel)]="patientIdToGenerate"
+      placeholder="Patient ID"
+      style="margin-right: 12px;"
+    />
+    <button class="generate-btn" (click)="onGenerateBill()">Generate Bill</button>
+    <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading || isFetching" class="loading-message">
+    Generating bill, please wait...
+  </div>
+
+  <!-- Bill Display -->
+  <div *ngIf="generatedBill" class="bill-details">
+    <div class="bill-header">
+      <div>
+        <strong>Bill ID:</strong> #{{ generatedBill.billId }}
+      </div>
+      <div>
+        <strong>Date:</strong> {{ generatedBill.createdAt | date:'dd/MM/yyyy HH:mm' }}
+      </div>
+      <div>
+        <strong>Status:</strong>
+        <span class="status-badge" [ngClass]="{
+          'status-paid': generatedBill.status === 'PAID',
+          'status-pending': generatedBill.status === 'PENDING'
+        }">{{ generatedBill.status }}</span>
+      </div>
+    </div>
+    <div class="patient-details">
+      <strong>Patient ID:</strong> {{ generatedBill.patientId }}
+    </div>
+    <table class="bill-table">
+      <thead>
+        <tr>
+          <th>No.</th>
+          <th>Type</th>
+          <th>Name</th>
+          <th>Quantity</th>
+          <th>Unit Price</th>
+          <th>Total Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of generatedBill.billItems; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ item.itemType }}</td>
+          <td>{{ item.itemName }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>{{ item.unitPrice | currency:'INR' }}</td>
+          <td>{{ item.totalPrice | currency:'INR' }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="bill-total">
+      <span><strong>Total Amount:</strong></span>
+      <span class="total-amount">{{ generatedBill.totalAmount | currency:'INR' }}</span>
+    </div>
+    <div class="bill-actions">
+      <button class="generate-btn" (click)="printPage()">Print Bill</button>
+      <button class="generate-btn secondary" (click)="resetFlow()">Generate Another Bill</button>
+      <button class="generate-btn secondary" (click)="updateStatus('PAID')">Mark as Paid</button>
+      <button class="generate-btn secondary" (click)="updateStatus('PENDING')">Mark as Pending</button>
+    </div>
+  </div>
+</div>
