@@ -1,3 +1,4 @@
+/* All previous CSS is the same */
 .container {
   max-width: 100%;
   max-height: 100%;
@@ -7,98 +8,105 @@
   border-radius: 10px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.08);
 }
-
 h2 {
   margin-bottom: 24px;
   font-weight: 700;
   color: #2F334A;
 }
-
-/* ADDED: Styles for the input group */
+.unsaved-indicator {
+  color: #e74c3c;
+  margin-left: 4px;
+}
 .input-group {
   display: flex;
   align-items: center;
   gap: 16px;
   margin-bottom: 24px;
 }
-
 .input-group label {
   font-weight: 600;
   color: #2F334A;
 }
-
-/* MODIFIED: Enhanced input field styles */
 #patientIdInput {
-  height: 42px; /* Matched to button height */
+  height: 42px;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 15px;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
-
 #patientIdInput:focus {
   outline: none;
   border-color: #2F9CCA;
   box-shadow: 0 0 0 3px rgba(47, 156, 202, 0.2);
 }
-
 .bill-details {
   margin-top: 20px;
 }
-
+.header-with-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 16px;
+  margin-bottom: 18px;
+}
 .bill-header {
   display: flex;
   gap: 32px;
-  margin-bottom: 18px;
   font-size: 16px;
   color: #444;
-  flex-wrap: wrap; /* Allows wrapping on smaller screens */
+  flex-wrap: wrap;
+  align-items: center;
 }
-
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.unsaved-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #e74c3c;
+  background-color: #fceae8;
+  padding: 6px 12px;
+  border-radius: 16px;
+}
 .patient-details {
   margin-bottom: 18px;
   font-size: 15px;
   color: #555;
 }
-
 .bill-table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 18px;
   font-size: 15px;
 }
-
 .bill-table th, .bill-table td {
   padding: 10px 14px;
   text-align: left;
   border-bottom: 1px solid #eaeaea;
 }
-
 .bill-table thead tr {
   background-color: #f1f4f8;
 }
-
 .bill-table tbody tr:last-child td {
   border-bottom: none;
 }
-
 .status-badge {
   padding: 5px 14px;
   margin-left: 10px;
   border-radius: 16px;
   font-size: 13px;
   font-weight: 600;
-  color: #2F334A; /* Changed for better contrast */
+  color: #2c3e50; 
   display: inline-block;
-  text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
 }
-
 .status-paid { background-color: #a6eba8; }
 .status-pending { background-color: #ffb6b6; }
-/* ADDED: Style for generated status */
 .status-generated { background-color: #8fd5fb; }
-
 .bill-total {
   display: flex;
   justify-content: flex-end;
@@ -110,21 +118,18 @@ h2 {
   padding-top: 18px;
   border-top: 2px solid #f1f4f8;
 }
-
 .total-amount {
   color: #2F9CCA;
   font-size: 20px;
 }
-
 .bill-actions {
   display: flex;
-  justify-content: center; /* Center buttons for a cleaner look */
+  justify-content: center;
   gap: 16px;
   flex-wrap: wrap;
   padding-top: 18px;
   border-top: 1px solid #eaeaea;
 }
-
 .generate-btn {
   background-color: #2F9CCA;
   color: white;
@@ -135,39 +140,49 @@ h2 {
   font-weight: 600;
   font-size: 15px;
   transition: all 0.2s;
-  height: 42px; /* Standard button height */
+  height: 42px;
 }
-
+.generate-btn.btn-small {
+  height: 36px;
+  padding: 8px 16px;
+  font-size: 14px;
+}
 .generate-btn.secondary {
   background-color: #f0f0f0;
   color: #333;
   border: 1px solid #ddd;
 }
-
 .generate-btn:not(.secondary):hover {
   background-color: #1a7f9c;
   transform: translateY(-1px);
 }
-
 .generate-btn.secondary:hover {
   background-color: #e0e0e0;
   border-color: #ccc;
 }
-
+.generate-btn:disabled {
+  background-color: #bdc3c7;
+  cursor: not-allowed;
+  transform: none;
+}
+.generate-btn.secondary:disabled {
+  background-color: #f5f5f5;
+  color: #bdc3c7;
+  border-color: #ecf0f1;
+  cursor: not-allowed;
+  transform: none;
+}
 .error-message {
   color: #d32f2f;
   margin-top: 12px;
   font-size: 15px;
 }
-
 .loading-message {
   color: #2F9CCA;
   font-size: 16px;
   margin: 24px 0;
   text-align: center;
 }
-
-/* ADDED: Style for the new remove button */
 .remove-btn {
   background-color: #fff;
   color: #d32f2f;
@@ -179,14 +194,11 @@ h2 {
   font-weight: 600;
   transition: all 0.2s ease;
 }
-
 .remove-btn:hover {
   background-color: #d32f2f;
   color: #fff;
   transform: translateY(-1px);
 }
-
-/* ADDED: Print styles to hide actions and improve layout */
 @media print {
   body {
     background-color: #fff;
@@ -198,10 +210,68 @@ h2 {
     padding: 0;
     max-width: 100%;
   }
-  .bill-actions, .remove-btn, .input-group, h2, .error-message, .loading-message {
+  .bill-actions, .remove-btn, .input-group, h2, .error-message, .loading-message, .unsaved-text, .header-actions {
     display: none !important;
   }
   .bill-details {
     margin-top: 0;
   }
+}
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.modal-content {
+  background: white;
+  padding: 24px 32px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  width: 100%;
+  max-width: 450px; /* Increased width for new layout */
+}
+.modal-content h3 {
+  margin-top: 0;
+  margin-bottom: 24px;
+  color: #2F334A;
+}
+.form-group {
+  margin-bottom: 16px;
+}
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #555;
+}
+.form-group input, 
+.form-group select { /* NEW: Style for select dropdown */
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+  box-sizing: border-box; 
+  background-color: white; /* Ensure select has a white background */
+}
+.modal-actions {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+/* NEW: Style for side-by-side form inputs */
+.form-row {
+  display: flex;
+  gap: 16px;
+}
+.form-row .form-group {
+  flex: 1; /* Each group takes equal space */
 }
