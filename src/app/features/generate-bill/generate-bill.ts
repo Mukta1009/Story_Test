@@ -22,7 +22,6 @@ export class GenerateBill implements OnInit {
   errorMessage: string | null = null;
   public hasUnsavedChanges: boolean = false;
   
-  // MODIFIED: State for the more detailed modal
   isMiscChargeModalVisible: boolean = false;
   newItem = {
     itemName: '',
@@ -46,7 +45,7 @@ export class GenerateBill implements OnInit {
     this.hasUnsavedChanges = false;
   }
   
-  // ... onGenerateBill and fetchGeneratedBill are unchanged ...
+  // ... onGenerateBill, fetchGeneratedBill, removeItem, recalculateTotal are unchanged ...
   onGenerateBill(): void {
     if (!this.patientIdToGenerate) {
       this.errorMessage = 'Please enter a Patient ID.';
@@ -87,7 +86,6 @@ export class GenerateBill implements OnInit {
     });
   }
   
-  // ... removeItem and recalculateTotal are unchanged ...
   removeItem(itemToRemove: any): void {
     if (!this.generatedBill?.billItems) return;
     this.generatedBill.billItems = this.generatedBill.billItems.filter(
@@ -108,14 +106,15 @@ export class GenerateBill implements OnInit {
     this.generatedBill.totalAmount = total;
   }
   
-  // ... changeStatusLocally is unchanged ...
-  changeStatusLocally(newStatus: 'PAID' | 'PENDING' | 'GENERATED'): void {
+  // NEW: A single function to toggle the status
+  toggleStatus(): void {
     if (!this.generatedBill) return;
+    const newStatus = this.generatedBill.status === 'PAID' ? 'PENDING' : 'PAID';
     this.generatedBill.status = newStatus;
     this.hasUnsavedChanges = true;
   }
-
-  // MODIFIED: Functions to manage the new, more detailed modal
+  
+  // ... modal functions are unchanged ...
   openMiscChargeModal(): void {
     this.isMiscChargeModalVisible = true;
   }
@@ -132,18 +131,15 @@ export class GenerateBill implements OnInit {
   }
 
   addMiscChargeItem(): void {
-    // More robust validation
     if (!this.newItem.itemName.trim() || !this.newItem.unitPrice || this.newItem.unitPrice <= 0 || !this.newItem.quantity || this.newItem.quantity <= 0) {
       alert('Please enter a valid item name, a positive quantity, and a positive price.');
       return;
     }
-
     const itemToAdd = {
       ...this.newItem,
       totalPrice: this.newItem.unitPrice * this.newItem.quantity,
       status: 'Unbilled'
     };
-
     this.generatedBill.billItems.push(itemToAdd);
     this.recalculateTotal();
     this.hasUnsavedChanges = true;

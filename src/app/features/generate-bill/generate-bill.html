@@ -27,13 +27,21 @@
       <div class="bill-header">
         <div><strong>Bill ID:</strong> #{{ generatedBill.billId }}</div>
         <div><strong>Date:</strong> {{ generatedBill.createdAt | date:'dd/MM/yyyy HH:mm' }}</div>
-        <div>
+        <div class="status-control">
           <strong>Status:</strong>
           <span class="status-badge" [ngClass]="{
             'status-paid': generatedBill.status === 'PAID',
             'status-pending': generatedBill.status === 'PENDING',
             'status-generated': generatedBill.status === 'GENERATED'
           }">{{ generatedBill.status }}</span>
+          
+          <label class="toggle-switch toggle-switch-small">
+            <input 
+              type="checkbox" 
+              [checked]="generatedBill.status === 'PAID'" 
+              (change)="toggleStatus()">
+            <span class="slider"></span>
+          </label>
         </div>
       </div>
       <div class="header-actions">
@@ -89,18 +97,6 @@
       <button class="generate-btn secondary" (click)="undoChanges()" [disabled]="!hasUnsavedChanges">
         Undo Changes
       </button>
-      <button 
-        class="generate-btn secondary" 
-        (click)="changeStatusLocally('PAID')" 
-        [disabled]="generatedBill.status === 'PAID'">
-        Mark as Paid
-      </button>
-      <button 
-        class="generate-btn secondary" 
-        (click)="changeStatusLocally('PENDING')" 
-        [disabled]="generatedBill.status === 'PENDING'">
-        Mark as Pending
-      </button>
       <button class="generate-btn secondary" (click)="printPage()">
         Print Bill
       </button>
@@ -114,22 +110,19 @@
 <div *ngIf="isMiscChargeModalVisible" class="modal-overlay">
   <div class="modal-content">
     <h3>Add Custom Bill Item</h3>
-    
     <div class="form-group">
       <label for="itemType">Item Type</label>
       <select id="itemType" [(ngModel)]="newItem.itemType">
         <option value="MISCELLANEOUS">Miscellaneous</option>
-        <option value="SERVICE">Service</option>
-        <option value="ADJUSTMENT">Adjustment</option>
-        <option value="EQUIPMENT">Equipment</option>
+        <option value="CONSULTATION">Consulation Fee</option>
+        <option value="MEDICINE">Medicine</option>
+        <option value="LAB">Lab</option>
       </select>
     </div>
-
     <div class="form-group">
       <label for="itemName">Item Name</label>
       <input id="itemName" type="text" [(ngModel)]="newItem.itemName" placeholder="e.g., Special Bandage">
     </div>
-
     <div class="form-row">
       <div class="form-group">
         <label for="quantity">Quantity</label>
@@ -140,7 +133,6 @@
         <input id="unitPrice" type="number" [(ngModel)]="newItem.unitPrice" placeholder="e.g., 250">
       </div>
     </div>
-    
     <div class="modal-actions">
       <button class="generate-btn" (click)="addMiscChargeItem()">Add Item</button>
       <button class="generate-btn secondary" (click)="closeMiscChargeModal()">Cancel</button>
