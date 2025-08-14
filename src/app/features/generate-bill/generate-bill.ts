@@ -1,6 +1,7 @@
 import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BillingService } from '../../services/billing';
 
 @Component({
@@ -12,7 +13,7 @@ import { BillingService } from '../../services/billing';
 })
 export class GenerateBill implements OnInit {
 
-  // --- All previous properties are the same ---
+  // --- Component State ---
   isAskingForPatientId = false;
   patientIdToGenerate: number | null = null;
   generatedBill: any = null;
@@ -20,28 +21,63 @@ export class GenerateBill implements OnInit {
   isLoading = false;
   isFetching = false;
   errorMessage: string | null = null;
+
+  // --- Change Tracking ---
   public hasUnsavedChanges: boolean = false;
-  
+
   // --- Modal State ---
   isMiscChargeModalVisible: boolean = false;
+  isEditMode: boolean = false;
+  editingItemIndex: number | null = null;
   newItem = {
     itemName: '',
     itemType: 'MISCELLANEOUS',
     quantity: 1,
     unitPrice: null as number | null
   };
-  
-  // NEW: State to manage editing
-  isEditMode: boolean = false;
-  editingItemIndex: number | null = null;
-
 
   constructor(
     private billingService: BillingService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
-  ngOnInit(): void { this.startBillGeneration(); }
+  /**
+   * This is the "brain" of the component. It checks the URL to decide whether
+   * to load an existing bill for editing or to show the form for a new one.
+   */
+  ngOnInit(): void {
+    const billId = this.route.snapshot.paramMap.get('id');
+    if (billId) {
+      // An ID was found in the URL -> EDIT MODE
+      this.isAskingForPatientId = false;
+      this.loadBillForEditing(billId);
+    } else {
+      // No ID in the URL -> GENERATE NEW MODE
+      this.startBillGeneration();
+    }
+  }
+
+  // --- DATA LOADING & INITIALIZATION ---
+
+  private loadBillForEditing(id: string): void {
+    this.isFetching = true;
+    this.billingService.getBillById(id).subscribe({
+      next: (billData) => {
+        this.generatedBill = billData;
+        this.originalBillBackup = JSON.parse(JSON.stringify(billData));
+        this.isFetching = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error fetching bill for editing:', err);
+        this.errorMessage = `Failed to load Bill #${id}. It may not exist.`;
+        this.isFetching = false;
+      }
+    });
+  }
+
   startBillGeneration(): void {
     this.isAskingForPatientId = true;
     this.generatedBill = null;
@@ -50,53 +86,44 @@ export class GenerateBill implements OnInit {
     this.patientIdToGenerate = null;
     this.hasUnsavedChanges = false;
   }
-  
-  // ... onGenerateBill and fetchGeneratedBill are unchanged ...
+
   onGenerateBill(): void {
-    if (!this.patientIdToGenerate) { this.errorMessage = 'Please enter a Patient ID.'; return; }
+    if (!this.patientIdToGenerate) {
+      this.errorMessage = 'Please enter a Patient ID.';
+      return;
+    }
     this.isLoading = true;
     this.errorMessage = null;
     this.isAskingForPatientId = false;
     this.billingService.generateBillByPatientId(this.patientIdToGenerate).subscribe({
-      next: (billId) => this.fetchGeneratedBill(billId),
+      next: (billId) => {
+        // After generating, navigate to the new edit URL for that bill
+        this.router.navigate(['/billing/edit', billId]);
+      },
       error: (err) => {
         console.error('Error during bill generation:', err);
         this.errorMessage = 'Failed to generate bill. The patient may have no unbilled appointments.';
         this.isLoading = false;
         this.isAskingForPatientId = true;
-        this.cdr.detectChanges();
       },
       complete: () => this.isLoading = false
     });
   }
 
-  private fetchGeneratedBill(billId: number): void {
-    this.isFetching = true;
-    this.billingService.getBillById(billId.toString()).subscribe({
-      next: (billData) => {
-        this.generatedBill = billData;
-        this.originalBillBackup = JSON.parse(JSON.stringify(billData));
-        this.hasUnsavedChanges = false; 
-        this.isFetching = false;
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('Error fetching bill details:', err);
-        this.errorMessage = `Bill was generated (ID: ${billId}), but failed to fetch details.`;
-        this.isFetching = false;
-        this.cdr.detectChanges();
-      }
-    });
-  }
-  
-  // ... removeItem and recalculateTotal are unchanged ...
+  // --- LOCAL BILL MANIPULATION ---
+
   removeItem(itemToRemove: any): void {
     if (!this.generatedBill?.billItems) return;
-    this.generatedBill.billItems = this.generatedBill.billItems.filter(
-      (item: any) => item !== itemToRemove
-    );
+    this.generatedBill.billItems = this.generatedBill.billItems.filter((item: any) => item !== itemToRemove);
     this.recalculateTotal();
-    this.hasUnsavedChanges = true; 
+    this.hasUnsavedChanges = true;
+  }
+
+  toggleStatus(): void {
+    if (!this.generatedBill) return;
+    const newStatus = this.generatedBill.status === 'PAID' ? 'PENDING' : 'PAID';
+    this.generatedBill.status = newStatus;
+    this.hasUnsavedChanges = true;
   }
 
   private recalculateTotal(): void {
@@ -109,16 +136,9 @@ export class GenerateBill implements OnInit {
     );
     this.generatedBill.totalAmount = total;
   }
-  
-  // ... toggleStatus is unchanged ...
-  toggleStatus(): void {
-    if (!this.generatedBill) return;
-    const newStatus = this.generatedBill.status === 'PAID' ? 'PENDING' : 'PAID';
-    this.generatedBill.status = newStatus;
-    this.hasUnsavedChanges = true;
-  }
-  
-  // MODIFIED: Functions to manage the modal for both adding and editing
+
+  // --- MODAL MANAGEMENT ---
+
   openAddItemModal(): void {
     this.isEditMode = false;
     this.isMiscChargeModalVisible = true;
@@ -127,8 +147,7 @@ export class GenerateBill implements OnInit {
   openEditItemModal(itemToEdit: any, index: number): void {
     this.isEditMode = true;
     this.editingItemIndex = index;
-    // Create a copy of the item to avoid changing the table while editing
-    this.newItem = { ...itemToEdit }; 
+    this.newItem = { ...itemToEdit }; // Create a copy for editing
     this.isMiscChargeModalVisible = true;
   }
 
@@ -136,7 +155,7 @@ export class GenerateBill implements OnInit {
     this.isMiscChargeModalVisible = false;
     this.isEditMode = false;
     this.editingItemIndex = null;
-    // Reset form fields
+    // Reset form fields to default
     this.newItem = {
       itemName: '',
       itemType: 'MISCELLANEOUS',
@@ -145,40 +164,27 @@ export class GenerateBill implements OnInit {
     };
   }
 
-  // In generate-bill.ts
+  saveItemChanges(): void {
+    if (!this.newItem.itemName.trim() || !this.newItem.unitPrice || this.newItem.unitPrice <= 0 || !this.newItem.quantity || this.newItem.quantity <= 0) {
+      alert('Please enter a valid item name, a positive quantity, and a positive price.');
+      return;
+    }
 
-saveItemChanges(): void {
-  // Validation remains the same
-  if (!this.newItem.itemName.trim() || !this.newItem.unitPrice || this.newItem.unitPrice <= 0 || !this.newItem.quantity || this.newItem.quantity <= 0) {
-    alert('Please enter a valid item name, a positive quantity, and a positive price.');
-    return;
+    if (this.isEditMode && this.editingItemIndex !== null) {
+      const updatedItem = { ...this.newItem, totalPrice: this.newItem.unitPrice * this.newItem.quantity };
+      this.generatedBill.billItems[this.editingItemIndex] = updatedItem;
+    } else {
+      const finalNewItem = { ...this.newItem, totalPrice: this.newItem.unitPrice * this.newItem.quantity, status: 'Unbilled' };
+      this.generatedBill.billItems.push(finalNewItem);
+    }
+    
+    this.recalculateTotal();
+    this.hasUnsavedChanges = true;
+    this.closeModal();
   }
 
-  // MODIFIED: Logic is now clearer for edit vs. add
-  if (this.isEditMode && this.editingItemIndex !== null) {
-    // EDIT MODE: Create the updated item. The 'status' is already part of this.newItem
-    const updatedItem = {
-      ...this.newItem,
-      totalPrice: this.newItem.unitPrice * this.newItem.quantity
-    };
-    this.generatedBill.billItems[this.editingItemIndex] = updatedItem;
+  // --- WORKFLOW & BACKEND ACTIONS ---
 
-  } else {
-    // ADD MODE: Create the new item and add the default status.
-    const finalNewItem = {
-      ...this.newItem,
-      totalPrice: this.newItem.unitPrice * this.newItem.quantity,
-      status: 'Unbilled' // This correctly adds the missing 'status' property
-    };
-    this.generatedBill.billItems.push(finalNewItem);
-  }
-  
-  this.recalculateTotal();
-  this.hasUnsavedChanges = true;
-  this.closeModal();
-}
-  
-  // ... undoChanges, saveChanges, printPage, resetFlow are unchanged ...
   undoChanges(): void {
     if (confirm('Are you sure you want to discard all changes?')) {
       if (!this.originalBillBackup) return;
@@ -194,7 +200,7 @@ saveItemChanges(): void {
       next: (updatedBill) => {
         this.generatedBill = updatedBill;
         this.originalBillBackup = JSON.parse(JSON.stringify(updatedBill));
-        this.hasUnsavedChanges = false; 
+        this.hasUnsavedChanges = false;
         alert(`Bill #${updatedBill.billId} has been successfully saved.`);
         this.cdr.detectChanges();
       },
@@ -210,12 +216,14 @@ saveItemChanges(): void {
   }
 
   resetFlow(): void {
+    const navigateToNew = () => this.router.navigate(['/billing/new']);
+    
     if (this.hasUnsavedChanges) {
       if (confirm('You have unsaved changes. Are you sure you want to start a new bill?')) {
-        this.startBillGeneration();
+        navigateToNew();
       }
     } else {
-      this.startBillGeneration();
+      navigateToNew();
     }
   }
 }

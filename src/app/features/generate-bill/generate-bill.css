@@ -107,7 +107,7 @@ h2 {
   color: #2c3e50; 
   display: inline-block;
 }
-.status-paid { background-color: #a6eba8; }
+.status-paid { background-color: #c1f0c3; }
 .status-pending { background-color: #ffb6b6; }
 .status-generated { background-color: #8fd5fb; }
 .bill-total {

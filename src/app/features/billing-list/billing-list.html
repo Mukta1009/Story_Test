@@ -71,8 +71,8 @@
   </div>
 </div>
 <!-- ...existing code... -->
+
 <table class="billing-table" *ngIf="bills && bills.length > 0">
-<!-- <table class="billing-table" *ngIf="bills.length > 0"> -->
   <thead>
     <tr>
       <th>Bill ID</th>
@@ -101,7 +101,9 @@
         <a [routerLink]="['/billing/view', bill.billId]">
           <i class="fas fa-download" title="View/Download Bill"></i>
         </a>
-        <i class="fas fa-pen" title="Edit"></i>
+        <a [routerLink]="['/billing/edit', bill.billId]">
+          <i class="fas fa-pen" title="Edit"></i>
+        </a>
         <i class="fas fa-trash" title="Delete" (click)="deleteBill(bill.billId)"></i>
       </td>
     </tr>

@@ -139,12 +139,15 @@
   color: #2f334a;
   display: inline-block;
 }
-.status-paid {
-  background-color: #8fd5fb;
-}
-.status-pending {
-  background-color: #ffb6b6;
-}
+  .status-paid {
+    background-color: #c1f0c3;
+  }
+  .status-pending {
+    background-color: #ffb6b6;
+  }
+  .status-generated {
+    background-color: #8fd5fb;
+  }
 .action-icons i {
   cursor: pointer;
   margin-left: 12px;

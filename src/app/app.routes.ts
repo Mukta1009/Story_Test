@@ -8,5 +8,6 @@ export const routes: Routes = [
   { path: '', redirectTo: 'billing', pathMatch: 'full' },
   { path: 'billing', component: BillingList },
   { path: 'billing/new', component: GenerateBill },
-  { path: 'billing/view/:id', component: ViewBill }
+  { path: 'billing/view/:id', component: ViewBill },
+  { path: 'billing/edit/:id', component: GenerateBill }
 ];
