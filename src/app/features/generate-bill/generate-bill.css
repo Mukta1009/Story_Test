@@ -1,5 +1,6 @@
 .container {
-  max-width: 700px;
+  max-width: 100%;
+  max-height: 100%;
   margin: 32px auto;
   background: #fff;
   padding: 32px 36px;
@@ -13,12 +14,46 @@ h2 {
   color: #2F334A;
 }
 
+/* ADDED: Styles for the input group */
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.input-group label {
+  font-weight: 600;
+  color: #2F334A;
+}
+
+/* MODIFIED: Enhanced input field styles */
+#patientIdInput {
+  height: 42px; /* Matched to button height */
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#patientIdInput:focus {
+  outline: none;
+  border-color: #2F9CCA;
+  box-shadow: 0 0 0 3px rgba(47, 156, 202, 0.2);
+}
+
+.bill-details {
+  margin-top: 20px;
+}
+
 .bill-header {
   display: flex;
   gap: 32px;
   margin-bottom: 18px;
   font-size: 16px;
   color: #444;
+  flex-wrap: wrap; /* Allows wrapping on smaller screens */
 }
 
 .patient-details {
@@ -50,20 +85,19 @@ h2 {
 
 .status-badge {
   padding: 5px 14px;
+  margin-left: 10px;
   border-radius: 16px;
   font-size: 13px;
   font-weight: 600;
-  color: #fff;
+  color: #2F334A; /* Changed for better contrast */
   display: inline-block;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
 }
 
-.status-paid {
-  background-color: #4caf50;
-}
-
-.status-pending {
-  background-color: #f9a825;
-}
+.status-paid { background-color: #a6eba8; }
+.status-pending { background-color: #ffb6b6; }
+/* ADDED: Style for generated status */
+.status-generated { background-color: #8fd5fb; }
 
 .bill-total {
   display: flex;
@@ -73,6 +107,8 @@ h2 {
   font-size: 18px;
   font-weight: 700;
   margin-bottom: 24px;
+  padding-top: 18px;
+  border-top: 2px solid #f1f4f8;
 }
 
 .total-amount {
@@ -82,8 +118,11 @@ h2 {
 
 .bill-actions {
   display: flex;
+  justify-content: center; /* Center buttons for a cleaner look */
   gap: 16px;
   flex-wrap: wrap;
+  padding-top: 18px;
+  border-top: 1px solid #eaeaea;
 }
 
 .generate-btn {
@@ -95,16 +134,24 @@ h2 {
   cursor: pointer;
   font-weight: 600;
   font-size: 15px;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
+  height: 42px; /* Standard button height */
 }
 
 .generate-btn.secondary {
   background-color: #f0f0f0;
   color: #333;
+  border: 1px solid #ddd;
 }
 
 .generate-btn:not(.secondary):hover {
   background-color: #1a7f9c;
+  transform: translateY(-1px);
+}
+
+.generate-btn.secondary:hover {
+  background-color: #e0e0e0;
+  border-color: #ccc;
 }
 
 .error-message {
@@ -118,4 +165,43 @@ h2 {
   font-size: 16px;
   margin: 24px 0;
   text-align: center;
+}
+
+/* ADDED: Style for the new remove button */
+.remove-btn {
+  background-color: #fff;
+  color: #d32f2f;
+  border: 1px solid #d32f2f;
+  padding: 4px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.remove-btn:hover {
+  background-color: #d32f2f;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* ADDED: Print styles to hide actions and improve layout */
+@media print {
+  body {
+    background-color: #fff;
+  }
+  .container {
+    box-shadow: none;
+    border: none;
+    margin: 0;
+    padding: 0;
+    max-width: 100%;
+  }
+  .bill-actions, .remove-btn, .input-group, h2, .error-message, .loading-message {
+    display: none !important;
+  }
+  .bill-details {
+    margin-top: 0;
+  }
 }

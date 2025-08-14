@@ -56,6 +56,6 @@ export class BillingService {
   } */
 
     generateBillByPatientId(patientId: number): Observable<number> {
-    return of(33);
+    return of(30);
   }
 }
