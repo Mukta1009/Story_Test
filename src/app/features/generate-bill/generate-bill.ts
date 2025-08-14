@@ -22,6 +22,7 @@ export class GenerateBill implements OnInit {
   errorMessage: string | null = null;
   public hasUnsavedChanges: boolean = false;
   
+  // --- Modal State ---
   isMiscChargeModalVisible: boolean = false;
   newItem = {
     itemName: '',
@@ -29,6 +30,11 @@ export class GenerateBill implements OnInit {
     quantity: 1,
     unitPrice: null as number | null
   };
+  
+  // NEW: State to manage editing
+  isEditMode: boolean = false;
+  editingItemIndex: number | null = null;
+
 
   constructor(
     private billingService: BillingService,
@@ -45,12 +51,9 @@ export class GenerateBill implements OnInit {
     this.hasUnsavedChanges = false;
   }
   
-  // ... onGenerateBill, fetchGeneratedBill, removeItem, recalculateTotal are unchanged ...
+  // ... onGenerateBill and fetchGeneratedBill are unchanged ...
   onGenerateBill(): void {
-    if (!this.patientIdToGenerate) {
-      this.errorMessage = 'Please enter a Patient ID.';
-      return;
-    }
+    if (!this.patientIdToGenerate) { this.errorMessage = 'Please enter a Patient ID.'; return; }
     this.isLoading = true;
     this.errorMessage = null;
     this.isAskingForPatientId = false;
@@ -86,6 +89,7 @@ export class GenerateBill implements OnInit {
     });
   }
   
+  // ... removeItem and recalculateTotal are unchanged ...
   removeItem(itemToRemove: any): void {
     if (!this.generatedBill?.billItems) return;
     this.generatedBill.billItems = this.generatedBill.billItems.filter(
@@ -106,7 +110,7 @@ export class GenerateBill implements OnInit {
     this.generatedBill.totalAmount = total;
   }
   
-  // NEW: A single function to toggle the status
+  // ... toggleStatus is unchanged ...
   toggleStatus(): void {
     if (!this.generatedBill) return;
     const newStatus = this.generatedBill.status === 'PAID' ? 'PENDING' : 'PAID';
@@ -114,14 +118,25 @@ export class GenerateBill implements OnInit {
     this.hasUnsavedChanges = true;
   }
   
-  // ... modal functions are unchanged ...
-  openMiscChargeModal(): void {
+  // MODIFIED: Functions to manage the modal for both adding and editing
+  openAddItemModal(): void {
+    this.isEditMode = false;
     this.isMiscChargeModalVisible = true;
   }
 
-  closeMiscChargeModal(): void {
+  openEditItemModal(itemToEdit: any, index: number): void {
+    this.isEditMode = true;
+    this.editingItemIndex = index;
+    // Create a copy of the item to avoid changing the table while editing
+    this.newItem = { ...itemToEdit }; 
+    this.isMiscChargeModalVisible = true;
+  }
+
+  closeModal(): void {
     this.isMiscChargeModalVisible = false;
-    // Reset form fields to default
+    this.isEditMode = false;
+    this.editingItemIndex = null;
+    // Reset form fields
     this.newItem = {
       itemName: '',
       itemType: 'MISCELLANEOUS',
@@ -130,21 +145,38 @@ export class GenerateBill implements OnInit {
     };
   }
 
-  addMiscChargeItem(): void {
-    if (!this.newItem.itemName.trim() || !this.newItem.unitPrice || this.newItem.unitPrice <= 0 || !this.newItem.quantity || this.newItem.quantity <= 0) {
-      alert('Please enter a valid item name, a positive quantity, and a positive price.');
-      return;
-    }
-    const itemToAdd = {
+  // In generate-bill.ts
+
+saveItemChanges(): void {
+  // Validation remains the same
+  if (!this.newItem.itemName.trim() || !this.newItem.unitPrice || this.newItem.unitPrice <= 0 || !this.newItem.quantity || this.newItem.quantity <= 0) {
+    alert('Please enter a valid item name, a positive quantity, and a positive price.');
+    return;
+  }
+
+  // MODIFIED: Logic is now clearer for edit vs. add
+  if (this.isEditMode && this.editingItemIndex !== null) {
+    // EDIT MODE: Create the updated item. The 'status' is already part of this.newItem
+    const updatedItem = {
+      ...this.newItem,
+      totalPrice: this.newItem.unitPrice * this.newItem.quantity
+    };
+    this.generatedBill.billItems[this.editingItemIndex] = updatedItem;
+
+  } else {
+    // ADD MODE: Create the new item and add the default status.
+    const finalNewItem = {
       ...this.newItem,
       totalPrice: this.newItem.unitPrice * this.newItem.quantity,
-      status: 'Unbilled'
+      status: 'Unbilled' // This correctly adds the missing 'status' property
     };
-    this.generatedBill.billItems.push(itemToAdd);
-    this.recalculateTotal();
-    this.hasUnsavedChanges = true;
-    this.closeMiscChargeModal();
+    this.generatedBill.billItems.push(finalNewItem);
   }
+  
+  this.recalculateTotal();
+  this.hasUnsavedChanges = true;
+  this.closeModal();
+}
   
   // ... undoChanges, saveChanges, printPage, resetFlow are unchanged ...
   undoChanges(): void {

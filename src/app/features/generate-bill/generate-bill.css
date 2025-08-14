@@ -187,21 +187,24 @@ h2 {
   margin: 24px 0;
   text-align: center;
 }
-.remove-btn {
-  background-color: #fff;
-  color: #d32f2f;
-  border: 1px solid #d32f2f;
-  padding: 4px 10px;
-  border-radius: 5px;
+
+/* MODIFIED: Simplified icon styles without custom colors */
+.action-icons {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  color: #555; /* A standard, neutral icon color */
+}
+
+.action-icons i {
   cursor: pointer;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 16px;
   transition: all 0.2s ease;
 }
-.remove-btn:hover {
-  background-color: #d32f2f;
-  color: #fff;
-  transform: translateY(-1px);
+
+.action-icons i:hover {
+  color: #000; /* Darken slightly on hover */
+  transform: scale(1.1);
 }
 
 /* --- TOGGLE SWITCH STYLES --- */
@@ -261,7 +264,7 @@ input:checked + .slider:before {
   transform: translateX(18px);
 }
 
-/* --- STYLES FOR THE MODAL (This was missing) --- */
+/* --- STYLES FOR THE MODAL --- */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -274,7 +277,6 @@ input:checked + .slider:before {
   align-items: center;
   z-index: 1000;
 }
-
 .modal-content {
   background: white;
   padding: 24px 32px;
@@ -283,24 +285,20 @@ input:checked + .slider:before {
   width: 100%;
   max-width: 450px;
 }
-
 .modal-content h3 {
   margin-top: 0;
   margin-bottom: 24px;
   color: #2F334A;
 }
-
 .form-group {
   margin-bottom: 16px;
 }
-
 .form-group label {
   display: block;
   margin-bottom: 8px;
   font-weight: 600;
   color: #555;
 }
-
 .form-group input, 
 .form-group select {
   width: 100%;
@@ -311,19 +309,16 @@ input:checked + .slider:before {
   box-sizing: border-box; 
   background-color: white;
 }
-
 .modal-actions {
   margin-top: 24px;
   display: flex;
   justify-content: flex-end;
   gap: 12px;
 }
-
 .form-row {
   display: flex;
   gap: 16px;
 }
-
 .form-row .form-group {
   flex: 1;
 }
@@ -339,7 +334,7 @@ input:checked + .slider:before {
     padding: 0;
     max-width: 100%;
   }
-  .bill-actions, .remove-btn, .input-group, h2, .error-message, .loading-message, .unsaved-text, .header-actions, .modal-overlay {
+  .bill-actions, .action-icons, .input-group, h2, .error-message, .loading-message, .unsaved-text, .header-actions, .modal-overlay {
     display: none !important;
   }
   .bill-details {
